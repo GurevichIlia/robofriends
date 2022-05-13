@@ -1,5 +1,5 @@
 import React, { BaseSyntheticEvent, useEffect, useState } from 'react';
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, HashRouter, Route, Routes } from "react-router-dom";
 import { Robot } from '../interfaces/robot.interface';
 import Dashboard from '../pages/Dashboard';
 import UserDetails from '../pages/RobotDetails';
@@ -33,12 +33,12 @@ const App = () => {
   return (
     <div className='tc' >
       <h1>RoboFriends</h1>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route index element={<Dashboard robots={filteredRobots} onSearchChange={onSearchChange} />} />
           <Route path="details/:id" element={<UserDetails robots={robots} />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
 
     </div>
   )
