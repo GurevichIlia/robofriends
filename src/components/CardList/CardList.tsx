@@ -2,10 +2,14 @@ import React from 'react';
 import { Robot } from '../../interfaces/robot.interface';
 import Card from '../Card/Card';
 
-const CardList = ({ robots }: { robots: Robot[] }) => {
+const CardList = ({ robots, select }: { robots: Robot[], select: (id: number) => void }) => {
 
   const cardsArray = robots.map(robot => {
-    return <Card key={robot.id} robot={robot} />
+    return (
+      <span key={robot.id} onClick={() => select(robot.id)}>
+        <Card robot={robot} />
+      </span>
+    )
   })
 
   return (

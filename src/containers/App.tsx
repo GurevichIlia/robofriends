@@ -1,59 +1,48 @@
-import React, { BaseSyntheticEvent, Component } from 'react';
-import CardList from '../components/CardList/CardList';
-import ErrorBoundry from '../components/ErrorBoundry/ErrorBoundry';
-import Scroll from '../components/Scroll/Scroll';
-import SearchBox from '../components/SearchBox/SearchBox';
+import React, { BaseSyntheticEvent, useEffect, useState } from 'react';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Robot } from '../interfaces/robot.interface';
+import Dashboard from '../pages/Dashboard';
+import UserDetails from '../pages/RobotDetails';
 
-export interface State {
-  robots: Robot[],
-  searchField: string
-}
-const state: State = {
-  robots: [],
-  searchField: ''
-}
 
-class App extends Component<any, State> {
-  constructor() {
-    super(null);
-    this.state = state
-  }
 
-  componentDidMount() {
-    console.log('MOUNTED')
+
+const App = () => {
+
+  const [robots, setRobots] = useState<Robot[]>([])
+  const [searchField, setSearchField] = useState<string>('')
+
+  useEffect(() => {
     fetch('https://jsonplaceholder.cypress.io/users')
       .then<Robot[]>(response => response.json())
-      .then(users => this.setState({ robots: users, searchField: '' }))
+      .then(users => setRobots(users))
+  }, [])
 
+
+  const onSearchChange = (event: BaseSyntheticEvent): void => {
+    setSearchField(event?.target?.value)
   }
 
-  public onSearchChange = (event: BaseSyntheticEvent): void => {
-    this.setState({ searchField: event?.target?.value })
+
+  const filteredRobots = robots.filter(robot => robot.name.toLowerCase().includes(searchField.toLowerCase()) || robot.email.toLowerCase().includes(searchField.toLowerCase()))
+
+  if (!robots.length) {
+    return <h1>Loading</h1>
   }
 
-  render() {
-    console.log('render')
-    const { robots, searchField } = this.state;
+  return (
+    <div className='tc' >
+      <h1>RoboFriends</h1>
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<Dashboard robots={filteredRobots} onSearchChange={onSearchChange} />} />
+          <Route path="details/:id" element={<UserDetails robots={robots} />} />
+        </Routes>
+      </BrowserRouter>
 
-    const filteredRobots = robots.filter(robot => robot.name.toLowerCase().includes(searchField.toLowerCase()) || robot.email.toLowerCase().includes(searchField.toLowerCase()))
+    </div>
+  )
 
-    if (!robots.length) {
-      return <h1>Loading</h1>
-    }
-
-    return (
-      <div className='tc' >
-        <h1>RoboFriends</h1>
-        <SearchBox onSearchChange={this.onSearchChange} />
-        <Scroll>
-          <ErrorBoundry>
-            <CardList robots={filteredRobots} />
-          </ErrorBoundry>
-        </Scroll>
-      </div>
-    )
-  }
 }
 
 export default App
